@@ -272,6 +272,15 @@ public struct MoveTree: Hashable, Sendable {
     return dictionary[index]?.move
   }
 
+  public mutating func promotePiece(
+    _ promotedPiece: Piece,
+    at index: Index
+  ) -> Move? {
+    Self.nodeLock.withLock {
+      dictionary[index]?.move.promotedPiece = promotedPiece
+    }
+      return dictionary[index]?.move.promotedPiece != nil ? dictionary[index]?.move : nil
+  }
   // MARK: - PGN
 
   /// An element for representing the ``MoveTree`` in
