@@ -131,7 +131,7 @@ public struct Game: Hashable, Sendable {
   /// This does not affect variations of the previous move nor sibling variations if the provided
   /// index is not the main variation
   ///
-  /// - parameter index: The ``MoveTree.Index`` of the move to remove.
+  /// - parameter index: The ``MoveTree/Index`` of the move to remove.
   ///
   /// - returns: The move index of the move before the index parameter.
   ///

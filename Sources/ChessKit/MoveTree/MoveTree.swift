@@ -97,9 +97,10 @@ public struct MoveTree: Hashable, Sendable {
   }
 
   /// Recursively removes a move and all variations from that move forward from the move tree.
-  /// This does not affect variations of the previous move.
+  /// This does not affect variations of the previous move nor sibling variations if the provided
+  /// index is not the main variation
   ///
-  /// - parameter index: The ``MoveTree.Index`` of the move to remove.
+  /// - parameter index: The ``MoveTree/Index`` of the move to remove.
   ///
   /// - returns: The move index of the move before the index parameter.
   ///
@@ -125,7 +126,7 @@ public struct MoveTree: Hashable, Sendable {
     }
       
     if dictionary[index.next] != nil {
-      removeMove(at: index.next)
+      removeMove(at: index.next) // Recursively delete all variation indecies
     }
       
     let previousIndex = index.previous
