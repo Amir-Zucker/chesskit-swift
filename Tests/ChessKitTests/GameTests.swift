@@ -12,12 +12,14 @@ final class GameTests: XCTestCase {
 
   // MARK: - Indices used in tests
 
+  private let e5Index = MoveTree.Index(number: 1, color: .black, variation: 0)
   private let nf3Index = MoveTree.Index(number: 2, color: .white, variation: 0)
+  private let nc6Index = MoveTree.Index(number: 2, color: .black, variation: 0)
   private let nc3Index = MoveTree.Index(number: 2, color: .white, variation: 1)
   private let nf6Index = MoveTree.Index(number: 2, color: .black, variation: 1)
-  private let nc6Index = MoveTree.Index(number: 2, color: .black, variation: 2)
-  private let nc6Index2 = MoveTree.Index(number: 2, color: .black, variation: 0)
+  private let nc6Index2 = MoveTree.Index(number: 2, color: .black, variation: 2)
   private let f5Index = MoveTree.Index(number: 2, color: .black, variation: 3)
+  private let bc4Index = MoveTree.Index(number: 3, color: .white, variation: 0)
 
   // MARK: - Setup
 
@@ -34,7 +36,7 @@ final class GameTests: XCTestCase {
     game.make(moves: ["Nc6", "f4"], from: nf6Index.previous)
 
     // add another variation to 2... Nf6
-    game.make(moves: ["f5", "exf5"], from: nc6Index2.previous)
+    game.make(moves: ["f5", "exf5"], from: nc6Index.previous)
 
     // make repeat moves to test proper handling
     game.make(move: "e4", from: minimum)
@@ -94,7 +96,7 @@ final class GameTests: XCTestCase {
 
     XCTAssertEqual(
       game.moves.index(
-        before: nc6Index
+        before: nc6Index2
       ),
       nc3Index
     )
@@ -111,6 +113,60 @@ final class GameTests: XCTestCase {
     let minimum = MoveTree.Index.getMinimum()
     XCTAssertEqual(game.moves.index(before: minimum.next), minimum)
     XCTAssertEqual(game.moves.index(after: nc3Index), nf6Index)
+  }
+    
+  func testUndoLastMove() {
+    XCTAssertEqual(game.moves.endIndex, bc4Index)
+        
+    game.undoMove()
+    
+    //Verify we removed the last index
+    XCTAssertNil(game.moves[bc4Index])
+      
+    //Verify end indices are where we expect to find them
+    XCTAssertEqual(game.moves.endIndex, nc6Index)
+    XCTAssertEqual(game.moves.lastMainVariationIndex, nc6Index)
+    
+    //Verify we did not affect variations of the previous move.
+    XCTAssertNotNil(game.moves[nf6Index])
+    XCTAssertNotNil(game.moves[nc6Index2])
+    XCTAssertNotNil(game.moves[f5Index])
+  }
+
+  func testUndoMoveAtIndex() {
+    XCTAssertEqual(game.moves.endIndex, bc4Index)
+    
+    game.undoMove(at: nf3Index)
+    
+    //Verify all subsequent moves are removed as well
+    XCTAssertNil(game.moves[nc6Index])
+    XCTAssertNil(game.moves[nc3Index])
+    XCTAssertNil(game.moves[nf6Index])
+    XCTAssertNil(game.moves[nc6Index2])
+    XCTAssertNil(game.moves[f5Index])
+    XCTAssertNil(game.moves[bc4Index])
+    XCTAssertNotNil(game.moves[e5Index])
+    
+    //Verify we are at the apropriate index
+    XCTAssertEqual(game.moves.endIndex, e5Index)
+    
+    //Verify we have exactly the amount of moves we expect to find.
+    //After 1. e4 e5 we expect to find 2 moves.
+    XCTAssertEqual(game.moves.dictionary.count, 2)
+  }
+    
+  func testUndeMoveNotAffectSiblingVariations() {
+    XCTAssertEqual(game.moves.endIndex, bc4Index)
+    
+    game.undoMove(at: nf6Index) //Second move, first variation.
+    
+    //Verify we didn't remove the mainVariation index
+    XCTAssertEqual(game.moves.endIndex, bc4Index)
+    
+    //Verify we didn't remove any sibling indices
+    XCTAssertNotNil(game.moves[nc6Index])
+    XCTAssertNotNil(game.moves[nc6Index2])
+    XCTAssertNotNil(game.moves[f5Index])
   }
 
   func testMoveAnnotation() {

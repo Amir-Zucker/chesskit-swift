@@ -96,6 +96,48 @@ public struct MoveTree: Hashable, Sendable {
     return newIndex
   }
 
+  /// Recursively removes a move and all variations from that move forward from the move tree.
+  /// This does not affect variations of the previous move.
+  ///
+  /// - parameter index: The ``MoveTree.Index`` of the move to remove.
+  ///
+  /// - returns: The move index of the move before the index parameter.
+  ///
+  @discardableResult
+  internal mutating func removeMove(at index: Index) -> Index {
+    Self.nodeLock.withLock {
+      _ = dictionary.removeValue(forKey: index)
+    }
+      
+    var variationIndex : Index
+    
+    if index.variation == Index.mainVariation { // If we are not in the main variation, we do not want to effect sibling variations
+      variationIndex = index
+    } else {
+      variationIndex = index.next
+    }
+      
+    variationIndex.variation += 1
+    
+    while dictionary[variationIndex] != nil {// Recursively delete all variation indecies.
+      removeMove(at: variationIndex)
+      variationIndex.variation += 1
+    }
+      
+    if dictionary[index.next] != nil {
+      removeMove(at: index.next)
+    }
+      
+    let previousIndex = index.previous
+    
+    self.root = dictionary[previousIndex]
+    if previousIndex.variation == Index.mainVariation {
+      lastMainVariationIndex = previousIndex
+    }
+      
+    return previousIndex
+  }
+
   /// Returns the index matching `move` in the next or child moves of the
   /// move contained at `index`.
   public func nextIndex(containing move: Move, for index: Index) -> Index? {

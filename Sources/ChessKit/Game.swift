@@ -126,6 +126,27 @@ public struct Game: Hashable, Sendable {
     positions[newIndex] = newPosition
     return newIndex
   }
+    
+  /// Recursively removes a move and all variations from that move forward from the move tree.
+  /// This does not affect variations of the previous move nor sibling variations if the provided
+  /// index is not the main variation
+  ///
+  /// - parameter index: The ``MoveTree.Index`` of the move to remove.
+  ///
+  /// - returns: The move index of the move before the index parameter.
+  ///
+  @discardableResult
+  public mutating func undoMove(at index: MoveTree.Index? = nil) -> MoveTree.Index {
+    let index = index ?? moves.endIndex
+      
+    guard index != moves.startIndex else {
+        return moves.startIndex
+    }
+      
+    moves.removeMove(at: index)
+      
+    return moves.endIndex
+  }
 
   /// Perform the provided move in the game.
   ///
