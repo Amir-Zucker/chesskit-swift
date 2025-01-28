@@ -20,6 +20,8 @@ final class GameTests: XCTestCase {
   private let nc6Index2 = MoveTree.Index(number: 2, color: .black, variation: 2)
   private let f5Index = MoveTree.Index(number: 2, color: .black, variation: 3)
   private let bc4Index = MoveTree.Index(number: 3, color: .white, variation: 0)
+  private let f5Index1 = MoveTree.Index(number: 3, color: .black, variation:1)
+  private let exf5Index = MoveTree.Index(number: 3, color: .black, variation:1)
 
   // MARK: - Setup
 
@@ -33,7 +35,7 @@ final class GameTests: XCTestCase {
     game.make(moves: ["Nc3", "Nf6", "Bc4"], from: nf3Index.previous)
 
     // add 2... Nc6 ... variation to 2... Nf6
-    game.make(moves: ["Nc6", "f4"], from: nf6Index.previous)
+    game.make(moves: ["Nc6", "f4", "f5", "exf5"], from: nf6Index.previous)
 
     // add another variation to 2... Nf6
     game.make(moves: ["f5", "exf5"], from: nc6Index.previous)
@@ -145,6 +147,10 @@ final class GameTests: XCTestCase {
     XCTAssertNil(game.moves[nc6Index2])
     XCTAssertNil(game.moves[f5Index])
     XCTAssertNil(game.moves[bc4Index])
+    XCTAssertNil(game.moves[f5Index1])
+    XCTAssertNil(game.moves[exf5Index])
+    
+    //Verify the index before the undo is still there
     XCTAssertNotNil(game.moves[e5Index])
     
     //Verify we are at the apropriate index
@@ -175,7 +181,7 @@ final class GameTests: XCTestCase {
 
     XCTAssertEqual(
       PGNParser.convert(game: game).split(separator: "\n").last,
-      "1. e4 e5 2. Nf3 (2. Nc3 $3 Nf6 (2... Nc6 3. f4) 3. Bc4) Nc6 (2... f5 {Comment test} 3. exf5) 3. Bc4"
+      "1. e4 e5 2. Nf3 (2. Nc3 $3 Nf6 (2... Nc6 3. f4 f5 4. exf5) 3. Bc4) Nc6 (2... f5 {Comment test} 3. exf5) 3. Bc4"
     )
   }
 
@@ -309,7 +315,7 @@ final class GameTests: XCTestCase {
       [TestKey1 "Test Value 1"]
       [TestKey2 "Test Value 2"]
 
-      1. e4 e5 2. Nf3 (2. Nc3 Nf6 (2... Nc6 3. f4) 3. Bc4) Nc6 (2... f5 3. exf5) 3. Bc4
+      1. e4 e5 2. Nf3 (2. Nc3 Nf6 (2... Nc6 3. f4 f5 4. exf5) 3. Bc4) Nc6 (2... f5 3. exf5) 3. Bc4
       """
 
     XCTAssertEqual(game.pgn, pgn)
