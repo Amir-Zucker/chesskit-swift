@@ -189,7 +189,7 @@ public struct Game: Hashable, Sendable {
   public mutating func undoLastMove() -> MoveTree.Index {
   // While the undo move below works perfectly fine with either nil index or
   // a given index, this creates a problem with the threefold repetition on Board object.
-  // Since the index could be comletely arbitrary, we would need to decrease the position
+  // Since the index could be completely arbitrary, we would need to decrease the position
   // hash value count by one as well. By limiting the undo to just the last move, we can
   // assume we need to update only the last move. 
     return undoMove()
@@ -203,6 +203,8 @@ public struct Game: Hashable, Sendable {
   ///
   /// - returns: The move index of the move before the index parameter.
   ///
+    ///
+  //warning! read comment on undoLastMose before changing to public access
   @discardableResult
   internal mutating func undoMove(at index: MoveTree.Index? = nil) -> MoveTree.Index {
     let index = index ?? moves.endIndex

@@ -126,7 +126,7 @@ public struct MoveTree: Hashable, Sendable {
     }
       
     if dictionary[index.next] != nil {
-      removeMove(at: index.next) // Recursively delete all variation indecies
+      removeMove(at: index.next) // Recursively delete all child indecies
     }
       
     let previousIndex = index.previous
