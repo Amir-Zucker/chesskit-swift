@@ -26,7 +26,14 @@ public struct Board: Sendable {
   public weak var delegate: BoardDelegate?
 
   /// The current position represented on the board.
-  public var position: Position
+    public var position: Position {
+        //if the position was changed from the current position for example by undoing last move,
+        //we need to decrease the number that the current position appeared.
+        //This approach is a quick patch and has some problem, a more thorough fix is needed.
+        willSet {
+            positionHashCounts[position.hashValue] = max(positionHashCounts[position.hashValue, default: 0] - 1, 0)
+        }
+    }
 
   /// A dictionary containing the occurrence counts for all the positions
   /// that have appeared on this board, keyed by the position's hash.
