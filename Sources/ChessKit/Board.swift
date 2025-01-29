@@ -54,6 +54,16 @@ public struct Board: Sendable {
   }
 
   // MARK: - Public
+  
+  /// Set the position and decrease repetition count.
+  /// This is a temporary solution to adress three folds repetition when undoing a move. 
+  public mutating func setPosition(_ newPosition: Position) {
+    //if the position was changed from the current position for example by undoing last move,
+    //we need to decrease the number that the current position appeared.
+    //This approach is a quick patch and has some problem, a more thorough fix is needed.
+    positionHashCounts[position.hashValue] = max(positionHashCounts[self.position.hashValue, default: 0] - 1, 0)
+    self.position = newPosition
+  }
 
   /// Moves the piece at a given square to a new square.
   ///

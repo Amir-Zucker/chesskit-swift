@@ -126,27 +126,6 @@ public struct Game: Hashable, Sendable {
     positions[newIndex] = newPosition
     return newIndex
   }
-    
-  /// Recursively removes a move and all variations from that move forward from the move tree.
-  /// This does not affect variations of the previous move nor sibling variations if the provided
-  /// index is not the main variation
-  ///
-  /// - parameter index: The ``MoveTree/Index`` of the move to remove.
-  ///
-  /// - returns: The move index of the move before the index parameter.
-  ///
-  @discardableResult
-  public mutating func undoMove(at index: MoveTree.Index? = nil) -> MoveTree.Index {
-    let index = index ?? moves.endIndex
-      
-    guard index != moves.startIndex else {
-        return moves.startIndex
-    }
-      
-    moves.removeMove(at: index)
-      
-    return moves.endIndex
-  }
 
   /// Perform the provided move in the game.
   ///
@@ -203,8 +182,40 @@ public struct Game: Hashable, Sendable {
 
     return index
   }
-    
 
+  /// Undo the last move played in the game
+  ///
+  ///  - returns: The move index of the move before the index parameter.
+  public mutating func undoLastMove() -> MoveTree.Index {
+  // While the undo move below works perfectly fine with either nil index or
+  // a given index, this creates a problem with the threefold repetition on Board object.
+  // Since the index could be comletely arbitrary, we would need to decrease the position
+  // hash value count by one as well. By limiting the undo to just the last move, we can
+  // assume we need to update only the last move. 
+    return undoMove()
+  }
+      
+  /// Recursively removes a move and all variations from that move forward from the move tree.
+  /// This does not affect variations of the previous move nor sibling variations if the provided
+  /// index is not the main variation
+  ///
+  /// - parameter index: The ``MoveTree/Index`` of the move to remove.
+  ///
+  /// - returns: The move index of the move before the index parameter.
+  ///
+  @discardableResult
+  internal mutating func undoMove(at index: MoveTree.Index? = nil) -> MoveTree.Index {
+    let index = index ?? moves.endIndex
+
+    guard index != moves.startIndex else {
+      return moves.startIndex
+    }
+
+    moves.removeMove(at: index)
+
+    return moves.endIndex
+  }
+    
   /// Promotes the piece the a given move to the selected piece.
   ///
   /// - parameter move: The move that promotes the piece.
