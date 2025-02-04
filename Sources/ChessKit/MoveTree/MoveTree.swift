@@ -131,7 +131,6 @@ public struct MoveTree: Hashable, Sendable {
       
     let previousIndex = index.previous
     
-    self.root = dictionary[previousIndex]
     if previousIndex.variation == Index.mainVariation {
       lastMainVariationIndex = previousIndex
     }
