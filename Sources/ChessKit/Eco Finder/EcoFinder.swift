@@ -11,19 +11,19 @@ import Foundation
 ///Find an ECO (encyclopedia of chess openings) in the internal openings library of ChessKit framework.
 ///Openings library file curtesy of [lichess openings library](https://github.com/lichess-org/chess-openings/tree/master)
 public struct EcoFinder: Sendable {
-    //Dictionary maping of pgn string and the index of the eco at ``_ecosArray``
+    //Dictionary maping of pgn moves string and the index of the eco at ``_ecosArray``
     private let ecoByMovesDictionary: [String: Int]
     
-    //Dictionary maping of eco codes  maping at ``_ecosArray``
+    //Dictionary maping of ECO names string and the index of the eco at ``_ecosArray``
     private let ecoByNameDictionary: [String: Int]
     
-    //The actual eco data
+    //The actual ECO data
     private let ecosArray: [Eco]
     
-    ///Loads the openings file in the background and init the EcoFinder
-    /// - Throws: FileNotFound - If there is no eco file at the expected location
-    /// - Throws: CouldNotOpenFile - if file read has failed
-    ///
+    /// Loads the openings file in the background and init the EcoFinder
+    /// - Throws: FileNotFound - If there is no ECO file at the expected location
+    /// - Throws: CouldNotOpenFile - if file read has failed for some reason
+    /// - Note: As long as this framework is unmodified, errors should never be thrown as the eco file is bundles with the framework itself.
     init() async throws {
         guard let fileUrl = Bundle.module.url(forResource: "eco", withExtension: "tsv") else { throw EcoFinderError.FileNotFound }
         guard let file = freopen(fileUrl.path(), "r", stdin) else { throw EcoFinderError.CouldNotOpenFile }
@@ -41,7 +41,7 @@ public struct EcoFinder: Sendable {
             }
             
             let ecoCode = String(line[0])
-            let name = String(line[1])
+            let name = String(line[1]).replacingOccurrences(of: "\"", with: "")
             let moves = String(line[2])
             
             let eco = Eco(name: name, ecoCode: ecoCode, moves: moves)
