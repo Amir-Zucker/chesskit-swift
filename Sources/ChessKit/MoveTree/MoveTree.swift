@@ -135,6 +135,12 @@ public struct MoveTree: Hashable, Sendable {
       lastMainVariationIndex = previousIndex
     }
       
+    if dictionary.count == 0 {
+      root = nil
+    } else {
+      root = dictionary[previousIndex]
+    }
+      
     return previousIndex
   }
 
